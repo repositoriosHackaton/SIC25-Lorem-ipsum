@@ -1,17 +1,17 @@
 from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 import numpy as np
+from joblib import load
 
 class RecipeRecomender():
-    def __init__(self, recipes, scaler=StandardScaler(), model=NearestNeighbors(metric="euclidean", algorithm='brute')):
+    def __init__(self, recipes, model, nn=NearestNeighbors(n_neighbors=10, algorithm='brute'),scaler=MinMaxScaler()):
         self.recipes = recipes
         self.scaler = scaler
         self.model = model
+        self.nn = nn
 
-        procesed_recipes = self.scaler.fit_transform(self.recipes.iloc[:,6:15].to_numpy())
-
-        model.fit(procesed_recipes)
+        self.scaler.fit(self.recipes[["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]].to_numpy())
     
     def recomend(self, **kwars):
         
@@ -26,25 +26,34 @@ class RecipeRecomender():
             "azucares": kwars.get("azucares", None) or self.recipes["SugarContent"].mean(),
             "proteinas": kwars.get("proteinas", None) or self.recipes["ProteinContent"].mean(),
         }
-
         valores = [list(nutritional_values.values())]
         procesed_input = np.array(self.scaler.transform(valores))
 
-        indices = self.model.kneighbors(procesed_input, return_distance=False)
+        clasificacion = self.model.predict(procesed_input)[0]
+
+        recipes = self.recipes[self.recipes["cluster"] == clasificacion]
+
+        self.nn.fit(recipes[["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"]].to_numpy())
+        indices = self.nn.kneighbors(procesed_input, return_distance=False)[0]
+        
         recomended_recipes = self.recipes.iloc[indices]
         return recomended_recipes
 
 
 def main():
 
-    recipes = pd.read_csv("./dataset/recipes_entrenamiento.csv")
+    model = load("./models/model.joblib")
 
-    recomender = RecipeRecomender(recipes)
+    recipes = pd.read_csv("./dataset/recipes_procesado.csv")
+    recipes_clustering = pd.read_csv("./dataset/recipes_entrenamiento_clusterizada.csv")
 
-    print(recomender.recomend(calorias=100))
+    recipes["cluster"] = recipes_clustering["cluster"]
 
+    recomender = RecipeRecomender(recipes, model=model)
 
+    recomended_recipes = recomender.recomend(calorias=100)
 
+    recomended_recipes["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"].to_csv("./dataset/recomendaciones.csv", index=False)
 
 if __name__ == "__main__":
     main()
