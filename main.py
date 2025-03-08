@@ -3,6 +3,8 @@ from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 import numpy as np
 from joblib import load
+from usuario import Usuario
+from valores_saludables import ValoresSaludables
 
 class RecipeRecomender():
     def __init__(self, recipes, model, nn=NearestNeighbors(n_neighbors=10, algorithm='brute'),scaler=MinMaxScaler()):
@@ -51,9 +53,16 @@ def main():
 
     recomender = RecipeRecomender(recipes, model=model)
 
-    recomended_recipes = recomender.recomend(calorias=100)
 
-    recomended_recipes["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"].to_csv("./dataset/recomendaciones.csv", index=False)
+    usuario = Usuario(nombre="Juan", peso=70, altura=170, edad=20, genero="hombre", nivel_ejercicio="activo")
+    valores_saludables = ValoresSaludables(usuario)
+
+
+    recomended_recipes = recomender.recomend(**valores_saludables.__dict__)
+
+    print(recomended_recipes)
+
+    recomended_recipes[ ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"] ].to_csv("./dataset/recomendaciones.csv", index=False)
 
 if __name__ == "__main__":
     main()
