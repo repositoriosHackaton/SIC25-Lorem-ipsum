@@ -5,7 +5,7 @@ class ValoresSaludables:
         self.user = user
         self.comidas_diarias = 3
         self.tmb = TMB(user.peso, user.altura, user.edad, user.genero)
-        self.calorias = calorias_saludables(self.tmb, user.nivel_ejercicio) / self.comidas_diarias
+        self.calorias = calorias_saludables(self.tmb, user.nivel_ejercicio) 
         self.grasas = grasas_saludables(self.calorias) / self.comidas_diarias
         self.grasas_saturadas = grasas_saturadas_saludables(self.calorias) / self.comidas_diarias
         self.colesterol = colesterol_saludable(self.calorias) / self.comidas_diarias
@@ -15,6 +15,7 @@ class ValoresSaludables:
         self.azucares = azucares_saludables(self.calorias) / self.comidas_diarias
         self.proteinas = proteinas_saludables(self.calorias) / self.comidas_diarias
 
+        self.calorias = self.calorias / self.comidas_diarias
 
 
 def TMB(peso, altura, edad, genero):
