@@ -1,3 +1,21 @@
+from usuario import Usuario
+
+class ValoresSaludables:
+    def __init__(self, user:Usuario):
+        self.user = user
+        self.tmb = TMB(user.peso, user.altura, user.edad, user.genero)
+        self.calorias = calorias_saludables(self.tmb, user.nivel_ejercicio)
+        self.grasas = grasas_saludables(self.calorias)
+        self.grasas_saturadas = grasas_saturadas_saludables(self.calorias)
+        self.colesterol = colesterol_saludable(self.calorias)
+        self.sodio = sodio_saludable()
+        self.carbohidratos = carbohidratos_saludables(self.calorias)
+        self.fibra = fibra_saludable(self.calorias)
+        self.azucares = azucares_saludables(self.calorias)
+        self.proteinas = proteinas_saludables(self.calorias)
+
+
+
 def TMB(peso, altura, edad, genero):
     if genero == "hombre":
         return 88.362+ 13.397*peso + 4.799 * altura - 5.677 * edad
