@@ -23,7 +23,7 @@ def cambiar_a_pagina_roja():
         widget.destroy()
 
     recomendaciones = pd.read_csv("./dataset/recomendaciones.csv")
-    df = pd.read_csv("./dataset/recipes.csv")
+    #df = pd.read_csv("./dataset/recipes.csv")
 
     recomendaciones_df = recomendaciones.to_dict('index')
 
@@ -83,18 +83,27 @@ def cambiar_a_pagina_roja():
     # Función para mostrar más información
     def show_more_info(receta):
         info_window = tk.Toplevel()
-        info_window.title(receta["nombre"])
+        info_window.title(receta["Name"])
         info_window.geometry("400x300")
 
         # Instrucciones
         tk.Label(info_window, text="Instrucciones:", font=("Arial", 12, "bold")).pack(pady=5)
-        for step in receta["repicetsIntrutions"]:
+        listo = main.corregir_instruccion(receta["RecipeInstructions"])
+        for step in listo:
             tk.Label(info_window, text=f"- {step}", wraplength=380, justify="left").pack(anchor="w")
 
         # Nutrientes
         tk.Label(info_window, text="Nutrientes:", font=("Arial", 12, "bold")).pack(pady=10)
-        for key, value in receta["nutrientes"].items():
-            tk.Label(info_window, text=f"{key.capitalize()}: {value}", wraplength=380, justify="left").pack(anchor="w")
+
+        tk.Label(info_window, text=f"Calories: {receta["Calories"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"FatContent: {receta["FatContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"SaturatedFatContent: {receta["SaturatedFatContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"CholesterolContent: {receta["CholesterolContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"SodiumContent: {receta["SodiumContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"CarbohydrateContent: {receta["CarbohydrateContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"FiberContent: {receta["FiberContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"SugarContent: {receta["SugarContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"ProteinContent: {receta["ProteinContent"]}", wraplength=380, justify="left").pack(anchor="w")
 
     # Frame con scroll
     canvas = tk.Canvas(frame_pagina_roja, bg="#ffcccc")
@@ -118,16 +127,16 @@ def cambiar_a_pagina_roja():
         frame.pack(fill="x", pady=5, padx=10)
 
         # Nombre
-        tk.Label(frame, text=receta["nombre"], font=("Arial", 14, "bold")).pack(anchor="w")
+        tk.Label(frame, text=receta["Name"], font=("Arial", 14, "bold")).pack(anchor="w")
 
         # Imagen (simulada con un label)
         tk.Label(frame, text="[Imagen]", bg="white", width=50, height=10).pack(pady=5)
 
         # Descripción
-        tk.Label(frame, text=receta["descripcion"], wraplength=550, justify="left").pack(anchor="w")
+        tk.Label(frame, text=receta["Description"], wraplength=550, justify="left").pack(anchor="w")
 
         # Tiempos
-        tiempos = f"Preparación: {format_time(receta['preptime'])}, Cocción: {format_time(receta['cooktime'])}, Total: {format_time(receta['totaltime'])}"
+        tiempos = f"Preparación: {format_time(receta['PrepTime'])}, Total: {format_time(receta['TotalTime'])}"
         tk.Label(frame, text=tiempos, font=("Arial", 10, "italic")).pack(anchor="w")
 
         # Botón "Ver más"
@@ -163,10 +172,12 @@ def procesar_formulario():
         return
 
 
-    main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
+    
     # Mostrar los datos en un mensaje (esto es opcional)
     #mensaje = f"Nombre: {nombre}\nPeso: {peso} kg\nAltura: {altura} cm\nEdad: {edad} años\nGénero: {genero}\nNivel de ejercicio: {nivel_ejercicio}"
     #messagebox.showinfo("Datos ingresados", mensaje)
+
+    main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
 
     # Cambiar a la página roja
     cambiar_a_pagina_roja()
@@ -206,13 +217,22 @@ def run():
     
     tk.Label(frame_formulario, text="Género:").grid(row=4, column=0, sticky="w")
     global entry_genero
-    entry_genero = tk.Entry(frame_formulario)
-    entry_genero.grid(row=4, column=1, pady=5)
+    sexo = ["hombre", "mujer"]
+    entry_genero = tk.StringVar(frame_formulario)
+
+    option_menu = tk.OptionMenu(frame_formulario, entry_genero, *sexo)
+    option_menu.grid(row=4, column=1, pady=5)
+    #sentry_genero = tk.Entry(frame_formulario)
+    
     
     tk.Label(frame_formulario, text="Nivel de ejercicio:").grid(row=5, column=0, sticky="w")
     global entry_nivel_ejercicio
-    entry_nivel_ejercicio = tk.Entry(frame_formulario)
-    entry_nivel_ejercicio.grid(row=5, column=1, pady=5)
+    actividad = ["sedentario","ligero","moderado","activo","muy activo"]
+    entry_nivel_ejercicio = tk.StringVar(frame_formulario)
+    option_menu2 = tk.OptionMenu(frame_formulario, entry_nivel_ejercicio, *actividad)
+    option_menu2.grid(row=5, column=1, pady=5)
+    #entry_nivel_ejercicio = tk.Entry(frame_formulario)
+    #entry_nivel_ejercicio.grid(row=5, column=1, pady=5)
     
     # Botón para procesar el formulario
     boton_enviar = tk.Button(frame_formulario, text="Enviar", command=procesar_formulario)

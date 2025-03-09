@@ -7,6 +7,25 @@ from usuario import Usuario
 from valores_saludables import ValoresSaludables
 import ventana
 
+import re
+
+def eliminar_antes_mayuscula(cadena):
+    # expresión regular para encontrar y reemplazar cualquier cosa antes de una letra mayúscula
+    return re.sub(r'.*?([A-Z])', r'\1', cadena, count = 1, flags=re.DOTALL)
+
+
+def corregir_instruccion(instr):
+    if instr.startswith("c("):
+        instr = instr[2:-1]
+    instr = instr.replace('"', '')
+    instr = instr.replace('\n', '')
+    instr = instr.replace("'", '')
+    instr = instr.replace("]", '')
+    instr = instr.replace("[", '')
+    instr = instr.split(', ')
+    instr = [eliminar_antes_mayuscula(cInstr) for cInstr in instr] # la cInstr significa cada instruccion
+    return instr
+
 
 class RecipeRecomender():
     def __init__(self, recipes, model, nn=NearestNeighbors(n_neighbors=10, algorithm='brute'),scaler=MinMaxScaler()):
@@ -63,7 +82,7 @@ def getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercici
 
     print(recomended_recipes)
 
-    recomended_recipes[ ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"] ].to_csv("./dataset/recomendaciones.csv", index=False)
+    recomended_recipes[ ["Name","PrepTime","TotalTime","Description","Images","RecipeInstructions","Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"] ].to_csv("./dataset/recomendaciones.csv", index=False)
 
 def main():
 
