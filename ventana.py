@@ -1,8 +1,17 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+import main
+import pandas as pd
+import numpy as np
+
 
 # Función para cambiar a la página roja
 def cambiar_a_pagina_roja():
+
+    # Frame para la página roja (inicialmente oculto)
+    global frame_pagina_rojas
+    frame_pagina_roja = tk.Frame(ventana, bg="#ffcccc")
+    
     # Ocultar el frame del formulario
     frame_formulario.pack_forget()
 
@@ -13,7 +22,14 @@ def cambiar_a_pagina_roja():
     for widget in frame_pagina_roja.winfo_children():
         widget.destroy()
 
-    # Datos de ejemplo
+    recomendaciones = pd.read_csv("./dataset/recomendaciones.csv")
+    df = pd.read_csv("./dataset/recipes.csv")
+
+    recomendaciones_df = recomendaciones.to_dict('index')
+
+    list_datos_comida = [valor for valor in recomendaciones_df.values()]
+
+    """  # Datos de ejemplo
     list_datos_comida = [
         {
             "nombre": "Pizza Margarita",
@@ -52,7 +68,7 @@ def cambiar_a_pagina_roja():
                 "proteinas": "15 g"
             }
         }
-    ]
+    ] """
 
     # Función para formatear el tiempo
     def format_time(time_str):
@@ -146,54 +162,68 @@ def procesar_formulario():
         messagebox.showwarning("Error", "Peso, altura y edad deben ser números válidos.")
         return
 
+
+    main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
     # Mostrar los datos en un mensaje (esto es opcional)
-    mensaje = f"Nombre: {nombre}\nPeso: {peso} kg\nAltura: {altura} cm\nEdad: {edad} años\nGénero: {genero}\nNivel de ejercicio: {nivel_ejercicio}"
-    messagebox.showinfo("Datos ingresados", mensaje)
+    #mensaje = f"Nombre: {nombre}\nPeso: {peso} kg\nAltura: {altura} cm\nEdad: {edad} años\nGénero: {genero}\nNivel de ejercicio: {nivel_ejercicio}"
+    #messagebox.showinfo("Datos ingresados", mensaje)
 
     # Cambiar a la página roja
     cambiar_a_pagina_roja()
 
+def run():
+    # Crear la ventana principal
+    global ventana
+    ventana = tk.Tk()
+    ventana.title("Formulario de Usuario")
+    ventana.geometry("600x500")
+    
+    # Frame para el formulario
+    global frame_formulario
+    frame_formulario = tk.Frame(ventana)
+    frame_formulario.pack(fill="both", expand=True, padx=20, pady=20)
+    
+    # Campos del formulario
+    tk.Label(frame_formulario, text="Nombre:").grid(row=0, column=0, sticky="w")
+    global entry_nombre
+    entry_nombre = tk.Entry(frame_formulario)
+    entry_nombre.grid(row=0, column=1, pady=5)
+    
+    tk.Label(frame_formulario, text="Peso (kg):").grid(row=1, column=0, sticky="w")
+    global entry_peso 
+    entry_peso = tk.Entry(frame_formulario)
+    entry_peso.grid(row=1, column=1, pady=5)
+    
+    tk.Label(frame_formulario, text="Altura (cm):").grid(row=2, column=0, sticky="w")
+    global entry_altura
+    entry_altura = tk.Entry(frame_formulario)
+    entry_altura.grid(row=2, column=1, pady=5)
+    
+    tk.Label(frame_formulario, text="Edad:").grid(row=3, column=0, sticky="w")
+    global entry_edad
+    entry_edad = tk.Entry(frame_formulario)
+    entry_edad.grid(row=3, column=1, pady=5)
+    
+    tk.Label(frame_formulario, text="Género:").grid(row=4, column=0, sticky="w")
+    global entry_genero
+    entry_genero = tk.Entry(frame_formulario)
+    entry_genero.grid(row=4, column=1, pady=5)
+    
+    tk.Label(frame_formulario, text="Nivel de ejercicio:").grid(row=5, column=0, sticky="w")
+    global entry_nivel_ejercicio
+    entry_nivel_ejercicio = tk.Entry(frame_formulario)
+    entry_nivel_ejercicio.grid(row=5, column=1, pady=5)
+    
+    # Botón para procesar el formulario
+    boton_enviar = tk.Button(frame_formulario, text="Enviar", command=procesar_formulario)
+    boton_enviar.grid(row=6, column=0, columnspan=2, pady=10)
+    
+    
 
-# Crear la ventana principal
-ventana = tk.Tk()
-ventana.title("Formulario de Usuario")
-ventana.geometry("600x500")
+    # Ejecutar la ventana
+    ventana.mainloop()
 
-# Frame para el formulario
-frame_formulario = tk.Frame(ventana)
-frame_formulario.pack(fill="both", expand=True, padx=20, pady=20)
 
-# Campos del formulario
-tk.Label(frame_formulario, text="Nombre:").grid(row=0, column=0, sticky="w")
-entry_nombre = tk.Entry(frame_formulario)
-entry_nombre.grid(row=0, column=1, pady=5)
 
-tk.Label(frame_formulario, text="Peso (kg):").grid(row=1, column=0, sticky="w")
-entry_peso = tk.Entry(frame_formulario)
-entry_peso.grid(row=1, column=1, pady=5)
-
-tk.Label(frame_formulario, text="Altura (cm):").grid(row=2, column=0, sticky="w")
-entry_altura = tk.Entry(frame_formulario)
-entry_altura.grid(row=2, column=1, pady=5)
-
-tk.Label(frame_formulario, text="Edad:").grid(row=3, column=0, sticky="w")
-entry_edad = tk.Entry(frame_formulario)
-entry_edad.grid(row=3, column=1, pady=5)
-
-tk.Label(frame_formulario, text="Género:").grid(row=4, column=0, sticky="w")
-entry_genero = tk.Entry(frame_formulario)
-entry_genero.grid(row=4, column=1, pady=5)
-
-tk.Label(frame_formulario, text="Nivel de ejercicio:").grid(row=5, column=0, sticky="w")
-entry_nivel_ejercicio = tk.Entry(frame_formulario)
-entry_nivel_ejercicio.grid(row=5, column=1, pady=5)
-
-# Botón para procesar el formulario
-boton_enviar = tk.Button(frame_formulario, text="Enviar", command=procesar_formulario)
-boton_enviar.grid(row=6, column=0, columnspan=2, pady=10)
-
-# Frame para la página roja (inicialmente oculto)
-frame_pagina_roja = tk.Frame(ventana, bg="#ffcccc")
-
-# Ejecutar la ventana
-ventana.mainloop()
+if __name__=="__main__":
+    run()

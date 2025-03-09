@@ -5,6 +5,8 @@ import numpy as np
 from joblib import load
 from usuario import Usuario
 from valores_saludables import ValoresSaludables
+import ventana
+
 
 class RecipeRecomender():
     def __init__(self, recipes, model, nn=NearestNeighbors(n_neighbors=10, algorithm='brute'),scaler=MinMaxScaler()):
@@ -42,6 +44,27 @@ class RecipeRecomender():
         return recomended_recipes
 
 
+def getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio):
+    model = load("./models/model.joblib")
+
+    recipes = pd.read_csv("./dataset/recipes_procesado.csv")
+    recipes_clustering = pd.read_csv("./dataset/recipes_entrenamiento_clusterizada.csv")
+
+    recipes["cluster"] = recipes_clustering["cluster"]
+
+    recomender = RecipeRecomender(recipes, model=model)
+
+
+    usuario = Usuario(nombre, peso, altura, edad, genero, nivel_ejercicio)
+    valores_saludables = ValoresSaludables(usuario)
+
+
+    recomended_recipes = recomender.recomend(**valores_saludables.__dict__)
+
+    print(recomended_recipes)
+
+    recomended_recipes[ ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"] ].to_csv("./dataset/recomendaciones.csv", index=False)
+
 def main():
 
     model = load("./models/model.joblib")
@@ -65,4 +88,5 @@ def main():
     recomended_recipes[ ["Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"] ].to_csv("./dataset/recomendaciones.csv", index=False)
 
 if __name__ == "__main__":
-    main()
+    #main()
+    ventana.run()
