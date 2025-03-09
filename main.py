@@ -9,6 +9,25 @@ import ventana
 
 import re
 
+# Para links
+
+# elimina cualquier cosa que este antes del https
+def corregir_link(enlace):
+    return re.sub(r'.*?(https://)', r'\1', enlace, flags=re.DOTALL)
+
+# arregla bien el enlace
+def corregir_links(links):
+    if links.startswith("c("):
+        links = links[2:-1]
+    links = links.replace('"', '')
+    links = links.replace("'", '')
+    links = links.replace("[", '')
+    links = links.replace("]", '')
+    links = links.split(', ')
+    # a veces vienen enlaces con regalitos antes del https por lo que hay que eliminar eso
+    links = [corregir_link(link) for link in links]
+    return links
+
 def eliminar_antes_mayuscula(cadena):
     # expresión regular para encontrar y reemplazar cualquier cosa antes de una letra mayúscula
     return re.sub(r'.*?([A-Z])', r'\1', cadena, count = 1, flags=re.DOTALL)

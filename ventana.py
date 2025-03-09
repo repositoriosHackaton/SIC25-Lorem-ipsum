@@ -3,6 +3,32 @@ from tkinter import ttk, messagebox
 import main
 import pandas as pd
 import numpy as np
+from PIL import Image, ImageTk
+import requests
+from io import BytesIO
+
+# Función para cargar y mostrar una imagen desde una URL
+def cargar_imagen_desde_url(label_img,url):
+    try:
+        # Descargar la imagen desde la URL
+        response = requests.get(url)
+        response.raise_for_status()  # Verificar si la descarga fue exitosa
+
+        # Abrir la imagen con Pillow
+        imagen_pillow = Image.open(BytesIO(response.content))
+
+        # Redimensionar la imagen si es necesario (opcional)
+        imagen_pillow = imagen_pillow.resize((200, 200))
+
+        # Convertir la imagen a un formato compatible con Tkinter
+        imagen_tk = ImageTk.PhotoImage(imagen_pillow)
+
+        # Mostrar la imagen en un Label
+        label_img.config(image=imagen_tk)
+        label_img.image = imagen_tk  # Guardar una referencia para evitar que la imagen sea eliminada por el recolector de basura
+    except Exception as e:
+        print(f"Error al cargar la imagen: {e}")
+        label_img.config(text="[Error al cargar la imagen]")
 
 
 # Función para cambiar a la página roja
@@ -130,7 +156,12 @@ def cambiar_a_pagina_roja():
         tk.Label(frame, text=receta["Name"], font=("Arial", 14, "bold")).pack(anchor="w")
 
         # Imagen (simulada con un label)
-        tk.Label(frame, text="[Imagen]", bg="white", width=50, height=10).pack(pady=5)
+        label_img = ttk.Label(frame)
+        label_img.pack(pady=5)
+
+        list_img = main.corregir_links(receta["Images"])
+
+        cargar_imagen_desde_url(label_img , list_img[0])
 
         # Descripción
         tk.Label(frame, text=receta["Description"], wraplength=550, justify="left").pack(anchor="w")
