@@ -84,7 +84,7 @@ def cambiar_a_pagina_roja():
         estilo.configure("Treeview.Heading", font=("Arial", 14, "bold"))
         
         # Crear la tabla
-        columnas = ("Ingrediente", "Precio Actual", "Precio Futuro")
+        columnas = ("Ingrediente", "Precio Actual", "Precio Futuro (2 meses)")
         tabla = ttk.Treeview(info_window, columns=columnas, show="headings")
         
         # Configurar las columnas
