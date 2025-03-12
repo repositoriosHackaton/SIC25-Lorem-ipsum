@@ -121,15 +121,15 @@ def cambiar_a_pagina_roja():
         # Nutrientes
         tk.Label(info_window, text="Nutrientes:", font=("Arial", 12, "bold")).pack(pady=10)
 
-        tk.Label(info_window, text=f"Calories: {receta["Calories"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"FatContent: {receta["FatContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"SaturatedFatContent: {receta["SaturatedFatContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"CholesterolContent: {receta["CholesterolContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"SodiumContent: {receta["SodiumContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"CarbohydrateContent: {receta["CarbohydrateContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"FiberContent: {receta["FiberContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"SugarContent: {receta["SugarContent"]}", wraplength=380, justify="left").pack(anchor="w")
-        tk.Label(info_window, text=f"ProteinContent: {receta["ProteinContent"]}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"Calories: {receta['Calories']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"FatContent: {receta['FatContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"SaturatedFatContent: {receta['SaturatedFatContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"CholesterolContent: {receta['CholesterolContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"SodiumContent: {receta['SodiumContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"CarbohydrateContent: {receta['CarbohydrateContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"FiberContent: {receta['FiberContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"SugarContent: {receta['SugarContent']}", wraplength=380, justify="left").pack(anchor="w")
+        tk.Label(info_window, text=f"ProteinContent: {receta['ProteinContent']}", wraplength=380, justify="left").pack(anchor="w")
 
     # Frame con scroll
     canvas = tk.Canvas(frame_pagina_roja, bg="#ffcccc")
