@@ -26,7 +26,7 @@ Transparencia: Sabrás exactamente cuánto cuesta cada platillo y cómo los camb
 
 Toma de decisiones: Tendrás información valiosa para decidir si es el momento adecuado para comprar ciertos ingredientes o buscar alternativas.
 
-##ejecucion:
+## ejecucion:
 hay que ejecutar primero 
 'pyhton ./setup.py y ./limpieza.py'
 
