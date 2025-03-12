@@ -6,6 +6,9 @@ import numpy as np
 from PIL import Image, ImageTk
 import requests
 from io import BytesIO
+import regresoresRece
+from datetime import datetime
+
 
 # Función para cargar y mostrar una imagen desde una URL
 def cargar_imagen_desde_url(label_img,url):
@@ -55,47 +58,6 @@ def cambiar_a_pagina_roja():
 
     list_datos_comida = [valor for valor in recomendaciones_df.values()]
 
-    """  # Datos de ejemplo
-    list_datos_comida = [
-        {
-            "nombre": "Pizza Margarita",
-            "descripcion": "Una deliciosa pizza con tomate, mozzarella y albahaca.",
-            "imagen": "pizza.jpg",  # Cambia por la ruta de una imagen real
-            "cooktime": "PT30M",
-            "preptime": "PT20M",
-            "totaltime": "PT50M",
-            "repicetsIntrutions": [
-                "Preparar la masa.",
-                "Extender la salsa de tomate.",
-                "Añadir mozzarella y albahaca.",
-                "Hornear durante 30 minutos."
-            ],
-            "nutrientes": {
-                "calorias": "250 kcal",
-                "grasas": "10 g",
-                "proteinas": "12 g"
-            }
-        },
-        {
-            "nombre": "Ensalada César",
-            "descripcion": "Ensalada fresca con pollo, crutones y aderezo César.",
-            "imagen": "ensalada.jpg",  # Cambia por la ruta de una imagen real
-            "cooktime": "PT10M",
-            "preptime": "PT15M",
-            "totaltime": "PT25M",
-            "repicetsIntrutions": [
-                "Lavar y cortar la lechuga.",
-                "Cocinar el pollo y cortarlo en tiras.",
-                "Mezclar con crutones y aderezo."
-            ],
-            "nutrientes": {
-                "calorias": "180 kcal",
-                "grasas": "8 g",
-                "proteinas": "15 g"
-            }
-        }
-    ] """
-
     # Función para formatear el tiempo
     def format_time(time_str):
         if "H" in time_str:
@@ -131,6 +93,37 @@ def cambiar_a_pagina_roja():
         tk.Label(info_window, text=f"SugarContent: {receta['SugarContent']}", wraplength=380, justify="left").pack(anchor="w")
         tk.Label(info_window, text=f"ProteinContent: {receta['ProteinContent']}", wraplength=380, justify="left").pack(anchor="w")
 
+         # Estilo
+        estilo = ttk.Style()
+        estilo.configure("Treeview", font=("Arial", 12), rowheight=25)
+        estilo.configure("Treeview.Heading", font=("Arial", 14, "bold"))
+        
+        # Crear la tabla
+        columnas = ("Ingrediente", "Precio Actual", "Precio Futuro")
+        tabla = ttk.Treeview(root, columns=columnas, show="headings")
+        
+        # Configurar las columnas
+        for col in columnas:
+            tabla.heading(col, text=col)
+            tabla.column(col, width=150, anchor="center")
+
+        ingredientes_lista = corregir_instruccion(receta["RecipeIngredientParts"])
+        modelosLineales = regresoresRece.regresorIngredientes(ingredientes_lista)
+
+        def isModelo(a, fecha):
+            if a == None:
+                return "No Info",
+            else:
+                return a.predict(fecha)
+        
+        # Insertar los datos en la tabla
+        for i, (ingrediente, precio) in enumerate(zip(ingredientes_lista, )):
+            tabla.insert("", "end", values=(ingrediente, f"${precio}", ""))
+        
+        # Posicionar la tabla en la ventana
+        tabla.pack(pady=20)
+
+    
     # Frame con scroll
     canvas = tk.Canvas(frame_pagina_roja, bg="#ffcccc")
     scrollbar = ttk.Scrollbar(frame_pagina_roja, orient="vertical", command=canvas.yview)
