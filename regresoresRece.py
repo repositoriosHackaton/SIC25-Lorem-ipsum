@@ -28,6 +28,10 @@ def promediar_precios_por_fecha(df):
     return df_promedio
 
 
+def escalada_de_data(date):
+    date = date.toordinal()
+    scaler = StandardScaler()
+
 # lists => list[str]
 def regresorIngredientes(lists):
 
@@ -79,7 +83,7 @@ def regresorIngredientes(lists):
             model = LinearRegression()
             model.fit(X_train_scaled, y_train)  # Entrenar el modelo con los datos escalados
     
-            ingredi_dict[ingrediente] = model
+            ingredi_dict[ingrediente] = {"modelo" : model, "scaler" : scaler}
     
     return ingredi_dict
         

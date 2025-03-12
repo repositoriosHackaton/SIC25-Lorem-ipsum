@@ -14,7 +14,7 @@ from datetime import datetime
 def cargar_imagen_desde_url(label_img,url):
     try:
         # Descargar la imagen desde la URL
-        response = requests.get(url)
+        response = requests.get(url, timeout=5)
         response.raise_for_status()  # Verificar si la descarga fue exitosa
 
         # Abrir la imagen con Pillow
@@ -29,6 +29,9 @@ def cargar_imagen_desde_url(label_img,url):
         # Mostrar la imagen en un Label
         label_img.config(image=imagen_tk)
         label_img.image = imagen_tk  # Guardar una referencia para evitar que la imagen sea eliminada por el recolector de basura
+    except requests.exceptions.Timeout:
+        print("La solicitud ha excedido el tiempo de espera.")
+        label_img.config(text="[Tiempo de espera agotado]")
     except Exception as e:
         print(f"Error al cargar la imagen: {e}")
         label_img.config(text="[Error al cargar la imagen]")
@@ -74,6 +77,77 @@ def cambiar_a_pagina_roja():
         info_window.title(receta["Name"])
         info_window.geometry("400x300")
 
+
+        # Estilo
+        estilo = ttk.Style()
+        estilo.configure("Treeview", font=("Arial", 12), rowheight=25)
+        estilo.configure("Treeview.Heading", font=("Arial", 14, "bold"))
+        
+        # Crear la tabla
+        columnas = ("Ingrediente", "Precio Actual", "Precio Futuro")
+        tabla = ttk.Treeview(info_window, columns=columnas, show="headings")
+        
+        # Configurar las columnas
+        for col in columnas:
+            tabla.heading(col, text=col)
+            tabla.column(col, width=150, anchor="center")
+
+        
+        ingredientes_lista = main.corregir_instruccion(receta["RecipeIngredientParts"])
+        modelosLineales = regresoresRece.regresorIngredientes(ingredientes_lista)
+
+        # Nueva fecha a predecir
+        fecha_solo = datetime.now().date()
+
+        fecha_actual = datetime.now()
+        # Sumar 2 meses manualmente
+        mes = fecha_actual.month - 1 + 2  # Restamos 1 porque los meses van de 0 a 11
+        año = fecha_actual.year + mes // 12
+        mes = mes % 12 + 1
+        dia = fecha_actual.day
+        
+        try:
+            fecha_futura = fecha_actual.replace(year=año, month=mes, day=dia)
+        except ValueError:
+             # Si el día no es válido para el mes (por ejemplo, 31 de febrero), ajustamos al último día del mes
+            fecha_futura = fecha_actual.replace(year=año, month=mes + 1, day=1) - timedelta(days=1)
+        
+        #nueva_fecha = "2023-01-10"
+        
+        # Convertir la nueva fecha a datetime y luego a ordinal
+        nueva_fecha_ordinal = pd.to_datetime(fecha_solo).toordinal()
+        futuro_fecha_ordinal = pd.to_datetime(fecha_futura).toordinal()
+        # Crear un DataFrame con el valor ordinal
+        nuevos_datos = pd.DataFrame({'date': [nueva_fecha_ordinal]})
+        nuevos_datos_futuros = pd.DataFrame({'date': [futuro_fecha_ordinal]})
+
+
+        print(ingredientes_lista)
+        print("\n\n")
+        print(modelosLineales, "\n\n")
+        
+        # Insertar los datos en la tabla
+        i = 0
+        for ingrediente, modeles in modelosLineales.items():
+            if(modeles == None):
+                tabla.insert("", "end", values=(ingrediente,"no data", "no data"))
+            else:
+                escalar_datos = modeles["scaler"].transform(nuevos_datos)
+                data = modeles["modelo"].predict(escalar_datos)
+
+                escalar_datos_futu = modeles["scaler"].transform(nuevos_datos_futuros)
+                data_futu = modeles["modelo"].predict(escalar_datos_futu)
+                
+                if(ingrediente=="eggs"):
+                    tabla.insert("", "end", values=(ingrediente, f"por unidad ${round(data[0], 2)}" , f"por unidad ${round(data_futu[0], 2)}"))
+                elif (ingrediente=="oil"):
+                    tabla.insert("", "end", values=(ingrediente, f"por Litros ${round(data[0], 2)}" , f"por Litros ${round(data_futu[0], 2)}"))
+                else:
+                    tabla.insert("", "end", values=(ingrediente, f"por Kg ${round(data[0], 2)}" , f"por Kg ${round(data_futu[0], 2)}"))
+        
+        # Posicionar la tabla en la ventana
+        tabla.pack(pady=20)
+        
         # Instrucciones
         tk.Label(info_window, text="Instrucciones:", font=("Arial", 12, "bold")).pack(pady=5)
         listo = main.corregir_instruccion(receta["RecipeInstructions"])
@@ -93,35 +167,7 @@ def cambiar_a_pagina_roja():
         tk.Label(info_window, text=f"SugarContent: {receta['SugarContent']}", wraplength=380, justify="left").pack(anchor="w")
         tk.Label(info_window, text=f"ProteinContent: {receta['ProteinContent']}", wraplength=380, justify="left").pack(anchor="w")
 
-         # Estilo
-        estilo = ttk.Style()
-        estilo.configure("Treeview", font=("Arial", 12), rowheight=25)
-        estilo.configure("Treeview.Heading", font=("Arial", 14, "bold"))
-        
-        # Crear la tabla
-        columnas = ("Ingrediente", "Precio Actual", "Precio Futuro")
-        tabla = ttk.Treeview(root, columns=columnas, show="headings")
-        
-        # Configurar las columnas
-        for col in columnas:
-            tabla.heading(col, text=col)
-            tabla.column(col, width=150, anchor="center")
-
-        ingredientes_lista = corregir_instruccion(receta["RecipeIngredientParts"])
-        modelosLineales = regresoresRece.regresorIngredientes(ingredientes_lista)
-
-        def isModelo(a, fecha):
-            if a == None:
-                return "No Info",
-            else:
-                return a.predict(fecha)
-        
-        # Insertar los datos en la tabla
-        for i, (ingrediente, precio) in enumerate(zip(ingredientes_lista, )):
-            tabla.insert("", "end", values=(ingrediente, f"${precio}", ""))
-        
-        # Posicionar la tabla en la ventana
-        tabla.pack(pady=20)
+         
 
     
     # Frame con scroll
@@ -201,7 +247,7 @@ def procesar_formulario():
     #mensaje = f"Nombre: {nombre}\nPeso: {peso} kg\nAltura: {altura} cm\nEdad: {edad} años\nGénero: {genero}\nNivel de ejercicio: {nivel_ejercicio}"
     #messagebox.showinfo("Datos ingresados", mensaje)
 
-    main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
+    #main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
 
     # Cambiar a la página roja
     cambiar_a_pagina_roja()
