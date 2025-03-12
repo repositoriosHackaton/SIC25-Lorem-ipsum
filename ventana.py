@@ -247,7 +247,7 @@ def procesar_formulario():
     #mensaje = f"Nombre: {nombre}\nPeso: {peso} kg\nAltura: {altura} cm\nEdad: {edad} años\nGénero: {genero}\nNivel de ejercicio: {nivel_ejercicio}"
     #messagebox.showinfo("Datos ingresados", mensaje)
 
-    #main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
+    main.getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercicio)
 
     # Cambiar a la página roja
     cambiar_a_pagina_roja()
