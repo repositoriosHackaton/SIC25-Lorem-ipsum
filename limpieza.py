@@ -48,7 +48,3 @@ data_procesada = data_procesada[~(condicion | condicion2)]
 
 data_procesada.to_csv('./dataset/recipes_procesado.csv', index=False)
 
-data_entrenamiento = data_procesada.drop(columns=["AuthorId", "AuthorName", "DatePublished", "PrepTime",
-                   "Images", "Name", "RecipeInstructions", "Description"])
-
-data_entrenamiento.to_csv('./dataset/recipes_entrenamiento.csv', index=False)
