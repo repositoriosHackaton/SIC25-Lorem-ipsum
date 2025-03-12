@@ -100,8 +100,8 @@ def getRecomendacionesPersona(nombre, peso, altura, edad, genero, nivel_ejercici
     recomended_recipes = recomender.recomend(**valores_saludables.__dict__)
 
     print(recomended_recipes)
-
-    recomended_recipes[ ["Name","PrepTime","TotalTime","Description","Images","RecipeInstructions","Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent"] ].to_csv("./dataset/recomendaciones.csv", index=False)
+    # añadido RecipeIngredientsPart
+    recomended_recipes[ ["Name","PrepTime","TotalTime","Description","Images","RecipeInstructions","Calories", "FatContent", "SaturatedFatContent", "CholesterolContent", "SodiumContent", "CarbohydrateContent", "FiberContent", "SugarContent", "ProteinContent", "RecipeIngredientParts"] ].to_csv("./dataset/recomendaciones.csv", index=False)
 
 def main():
 
